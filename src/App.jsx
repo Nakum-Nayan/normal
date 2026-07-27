@@ -12,12 +12,12 @@ import "./App.css";
 function App() {
   return (
     <div className='w-screen min-h-screen bg-richblack-900 flex flex-col font-inter'>
-      {/* <Navbar /> */}
+      <Navbar />
       <Routes>
         <Route path='/' element={ <Home /> } />
-        {/* <Route path="/calculator" element={ <Calculator/> } />
+        <Route path="/calculator" element={ <Calculator/> } />
         <Route path="/materials" element={ <MaterialTable/> } />
-        <Route path="/contact" element={ <Contact/> } /> */}
+        <Route path="/contact" element={ <Contact/> } />
       </Routes>
     </div>
   );

@@ -1,45 +1,118 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+
 const Navbar = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <nav className="text-white shadow-md">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+    <nav className="sticky top-0 z-50 bg-white shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-center sm:justify-between">
 
         {/* Logo */}
-        <div>
-          <h1 className="text-2xl font-bold">Jay Ramapir</h1>
-        </div>
+        <Link
+          to="/"
+          className="text-xl md:text-3xl font-bold text-black-300 hover:text-orange-900 transition"
+        >
+          Gurukrupa Enterprise
+        </Link>
 
-        {/* Navigation */}
-        <ul className="flex items-center gap-6 font-medium">
+        {/* Desktop Menu */}
+        <ul className="hidden md:flex items-center gap-8 text-black font-medium">
           <li>
-            <a href="/" className="hover:text-yellow-300 transition">
+            <Link
+              to="/"
+              className="hover:text-orange-900 transition duration-200"
+            >
               Home
-            </a>
+            </Link>
           </li>
 
           <li>
-            <a href="/calculator" className="hover:text-yellow-300 transition">
+            <Link
+              to="/calculator"
+              className="hover:text-orange-900 transition duration-200"
+            >
               Calculator
-            </a>
+            </Link>
           </li>
 
           <li>
-            <a href="/materials" className="hover:text-yellow-300 transition">
+            <Link
+              to="/materials"
+              className="hover:text-orange-900 transition duration-200"
+            >
               Materials
-            </a>
+            </Link>
           </li>
 
           <li>
-            <a href="/contact" className="hover:text-yellow-300 transition">
+            <Link
+              to="/contact"
+              className="hover:text-orange-900 transition duration-200"
+            >
               Contact
-            </a>
+            </Link>
           </li>
         </ul>
 
-        {/* Button */}
-        <button className="bg-yellow-400 text-black px-5 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition">
-          Get Started
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden text-white text-3xl"
+        >
+          {menuOpen ? "✕" : "☰"}
         </button>
+      </div>
 
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ${
+          menuOpen ? "max-h-80" : "max-h-0"
+        }`}
+      >
+        <ul className="bg-blue-800 text-white text-center">
+
+          <li className="border-b border-blue-700">
+            <Link
+              to="/"
+              onClick={() => setMenuOpen(false)}
+              className="block py-3 hover:bg-blue-900"
+            >
+              Home
+            </Link>
+          </li>
+
+          <li className="border-b border-blue-700">
+            <Link
+              to="/calculator"
+              onClick={() => setMenuOpen(false)}
+              className="block py-3 hover:bg-blue-900"
+            >
+              Calculator
+            </Link>
+          </li>
+
+          <li className="border-b border-blue-700">
+            <Link
+              to="/materials"
+              onClick={() => setMenuOpen(false)}
+              className="block py-3 hover:bg-blue-900"
+            >
+              Materials
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/contact"
+              onClick={() => setMenuOpen(false)}
+              className="block py-3 hover:bg-blue-900"
+            >
+              Contact
+            </Link>
+          </li>
+
+        </ul>
       </div>
     </nav>
   );
