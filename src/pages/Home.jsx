@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import html2canvas from "html2canvas-pro";
+import jsPDF from "jspdf";
 
 const getInitialItems = () => [
   { placeholder: "Enter Foot Pel", material: "", qty: "", rate: "" },
   { placeholder: "Enter Foot Jali", material: "", qty: "", rate: "" },
   { placeholder: "Enter Besal Tar", material: "", qty: "", rate: "" },
   { placeholder: "Enter FT Teka", material: "", qty: "", rate: "" },
-  { placeholder: "Hut", material: "", qty: "", rate: "" },
+  { placeholder: "Huk", material: "", qty: "", rate: "" },
   { placeholder: "Tektar Bhadu", material: "", qty: "", rate: "" },
   { placeholder: "FitigaMani", material: "", qty: "", rate: "" },
   { placeholder: "Vehicle Bhadu", material: "", qty: "", rate: "" },
@@ -15,15 +17,15 @@ const getInitialItems = () => [
 ];
 
 export default function Home() {
+  const pdfRef = useRef(null);
+
   const [projectName, setProjectName] = useState("");
   const [items, setItems] = useState(getInitialItems());
 
   const handleChange = (index, field, value) => {
-    setItems((prev) =>
-      prev.map((item, i) =>
-        i === index ? { ...item, [field]: value } : item
-      )
-    );
+    const newItems = [...items];
+    newItems[index][field] = value;
+    setItems(newItems);
   };
 
   const handleRefresh = () => {
@@ -31,39 +33,90 @@ export default function Home() {
     setItems(getInitialItems());
   };
 
-  const total = items.reduce(
-    (sum, item) =>
-      sum + (Number(item.qty) || 0) * (Number(item.rate) || 0),
-    0
-  );
+  const total = items.reduce((sum, item) => {
+    return (
+      sum +
+      (Number(item.qty) || 0) *
+      (Number(item.rate) || 0)
+    );
+  }, 0);
+
+  const downloadPDF = async () => {
+    try {
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        onclone: (document) => {
+          document.body.style.color = "#000";
+          document.body.style.background = "#fff";
+        },
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight =
+        (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        0,
+        pdfWidth,
+        pdfHeight
+      );
+
+      let fileName = projectName.trim();
+
+      if (fileName === "") {
+        fileName = "Material-Calculator";
+      }
+
+      fileName = fileName.replace(/[\\/:*?"<>|]/g, "");
+
+      pdf.save(`${fileName}.pdf`);
+    } catch (err) {
+      console.log(err);
+      alert("PDF Download Failed");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-2 md:p-6">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-3 md:p-6">
 
-        {/* Header */}
-        <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-3 mb-5">
+      <div
+        ref={pdfRef}
+        className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-4"
+      >
+
+        <div className="flex flex-col-reverse md:flex-row justify-between gap-3 mb-6">
 
           <input
             type="text"
             placeholder="Enter Name"
             value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            className="w-full md:w-80 h-10 md:h-12 border rounded-lg px-2 text-center text-base md:text-xl"
+            onChange={(e) =>
+              setProjectName(e.target.value)
+            }
+            className="w-full md:w-80 h-11 border rounded-lg px-3 text-center"
           />
 
           <button
             onClick={handleRefresh}
-            className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white py-2 px-5 rounded-lg"
+            className="bg-red-600 text-white rounded-lg px-6 py-2 hover:bg-red-700"
           >
             Refresh
           </button>
 
         </div>
 
-        {/* Table */}
-        <table className="w-full border border-gray-400 text-center text-xs md:text-base">
-          <thead className="bg-blue-600 text-white">
+        <table className="w-full border text-center border-gray-400">
+          <thead className="text-white" style={{ backgroundColor: "#2563eb" }}>
             <tr>
               <th className="border p-2">Material</th>
               <th className="border p-2">Qty</th>
@@ -83,7 +136,7 @@ export default function Home() {
                     onChange={(e) =>
                       handleChange(index, "material", e.target.value)
                     }
-                    className="w-full h-8 md:h-10 border rounded text-center text-xs md:text-base px-1"
+                    className="w-full h-10 border rounded px-2 text-center outline-none"
                   />
                 </td>
 
@@ -95,7 +148,7 @@ export default function Home() {
                     onChange={(e) =>
                       handleChange(index, "qty", e.target.value)
                     }
-                    className="w-full h-8 md:h-10 border rounded text-center text-xs md:text-base px-1"
+                    className="w-full h-10 border rounded px-2 text-center outline-none"
                   />
                 </td>
 
@@ -107,11 +160,11 @@ export default function Home() {
                     onChange={(e) =>
                       handleChange(index, "rate", e.target.value)
                     }
-                    className="w-full h-8 md:h-10 border rounded text-center text-xs md:text-base px-1"
+                    className="w-full h-10 border rounded px-2 text-center outline-none"
                   />
                 </td>
 
-                <td className="border font-bold text-xs md:text-lg">
+                <td className="border font-bold">
                   {(
                     (Number(item.qty) || 0) *
                     (Number(item.rate) || 0)
@@ -122,19 +175,31 @@ export default function Home() {
           </tbody>
         </table>
 
-        {/* Total */}
-        <div className="flex justify-center md:justify-end mt-5">
-          <div className="w-full md:w-64 border rounded-lg shadow">
-            <div className="flex justify-between p-3">
-              <span className="font-semibold">Total</span>
-              <span className="font-bold text-blue-600">
-                {total.toLocaleString()}
+        <div className="flex justify-end mt-6">
+          <div className="w-72 border rounded-lg shadow-md bg-white">
+            <div className="flex justify-between p-4">
+              <span className="font-semibold text-lg">
+                Total
+              </span>
+
+              <span className="font-bold text-lg" style={{ color: "#2563eb" }}>
+                ₹ {total.toLocaleString()}
               </span>
             </div>
           </div>
         </div>
 
       </div>
+
+      <div className="flex justify-center mt-6">
+        <button
+          onClick={downloadPDF}
+          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg"
+        >
+          Download PDF
+        </button>
+      </div>
+
     </div>
   );
 }
