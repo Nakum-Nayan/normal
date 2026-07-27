@@ -9,6 +9,9 @@ const getInitialItems = () => [
   { placeholder: "Tektar Bhadu", material: "", qty: "", rate: "" },
   { placeholder: "FitigaMani", material: "", qty: "", rate: "" },
   { placeholder: "Vehicle Bhadu", material: "", qty: "", rate: "" },
+  { placeholder: "Other Value", material: "", qty: "", rate: "" },
+  { placeholder: "Other Value", material: "", qty: "", rate: "" },
+  { placeholder: "Other Value", material: "", qty: "", rate: "" },
 ];
 
 export default function Home() {
